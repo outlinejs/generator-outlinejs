@@ -1,0 +1,64 @@
+{
+  "private": true,
+  "engines": {
+    "node": ">=5.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^6.2.3",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react": "^6.3.13",
+    "babelify": "^7.2.0",
+    "browser-sync": "^2.10.1",
+    "browserify": "^12.0.1",
+    "browserify-shim": "^3.8.11",
+    "del": "^2.2.0",
+    "eslint-plugin-react": "^3.14.0",
+    "gulp": "^3.9.0",
+    "gulp-cache": "^0.4.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-cssnano": "^2.0.1",
+    "gulp-eslint": "^1.1.1",
+    "gulp-htmlmin": "^1.3.0",
+    "gulp-if": "^2.0.0",
+    "gulp-imagemin": "^2.4.0",
+    "gulp-load-plugins": "^1.1.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-postcss": "^6.0.1",
+    "gulp-sass": "^2.1.1",
+    "gulp-size": "^2.0.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.5.1",
+    "gulp-useref": "^3.0.4",
+    "gulp-util": "^3.0.7",
+    "main-bower-files": "^2.11.0",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.6.1",
+    "wiredep": "^3.0.0"
+  },
+  "dependencies": {<% if (includeModernizr) { %>
+    "modernizr": "^3.2.0",<% } if (includeBootstrap) { %>
+    "bootstrap-sass": "^3.3.6",<% } %>
+    "outlinejs": "^1.0.1",
+    "backbone": "^1.2.3",
+    "jquery": "^2.1.4",
+    "react": "^0.14.5",
+    "underscore": "^1.8.3"
+  },
+  "browserify": {
+    "transform": [
+      "babelify",
+      "browserify-shim"
+    ]
+  },
+  "browser": {<% if (includeBootstrap) { %>
+    "bootstrap": "./node_modules/bootstrap-sass/assets/javascripts/bootstrap.js"
+  <% } %>},
+  "browserify-shim": {<% if (includeBootstrap) { %>
+    "bootstrap": {
+      "depends": [
+        "jquery:jQuery"
+      ]
+    }
+  <% } %>}
+}
