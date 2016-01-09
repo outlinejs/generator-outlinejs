@@ -1,6 +1,6 @@
 {
   "name": "generator-outlinejs",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "OutlineJS Generator",
   "homepage": "http://www.rapidosoft.it/outlinejs",
   "author": {
@@ -31,7 +31,7 @@
     "gulp-nsp": "^2.1.0",
     "gulp-coveralls": "^0.1.0"
   },
-  "repository": "faxioman/generator-outlinejs",
+  "repository": "https://github.com/faxioman/generator-outlinejs",
   "scripts": {
     "prepublish": "gulp prepublish",
     "test": "gulp"
