@@ -1,8 +1,8 @@
 {
   "name": "generator-outlinejs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "OutlineJS Generator",
-  "homepage": "http://www.rapidosoft.it/outlinejs",
+  "homepage": "https://github.com/faxioman/generator-outlinejs",
   "author": {
     "name": "Fabio Masini",
     "email": "fabio@rapidosoft.it",

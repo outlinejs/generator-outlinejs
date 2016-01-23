@@ -107,8 +107,8 @@ module.exports = yeoman.generators.Base.extend({
       var bsPath;
 
       this.fs.copyTpl(
-        this.templatePath('app/index.html'),
-        this.destinationPath('app/index.html'),
+        this.templatePath('project/index.html'),
+        this.destinationPath('project/index.html'),
         {
           appname: this.appname,
           includeBootstrap: this.includeBootstrap,
@@ -116,34 +116,34 @@ module.exports = yeoman.generators.Base.extend({
         }
       );
       this.fs.copy(
-        this.templatePath('app/urls.js'),
-        this.destinationPath('app/urls.js')
+        this.templatePath('project/urls.js'),
+        this.destinationPath('project/urls.js')
       );
       this.fs.copy(
-        this.templatePath('app/settings.js'),
-        this.destinationPath('app/settings.js')
+        this.templatePath('project/settings.js'),
+        this.destinationPath('project/settings.js')
       );
       this.fs.copy(
-        this.templatePath('app/main.js'),
-        this.destinationPath('app/main.js')
+        this.templatePath('project/main.js'),
+        this.destinationPath('project/main.js')
       );
     },
     alloApp: function () {
       this.fs.copy(
-        this.templatePath('app/allo-app/controllers.js'),
-        this.destinationPath('app/allo-app/controllers.js')
+        this.templatePath('project/allo-app/controllers.js'),
+        this.destinationPath('project/allo-app/controllers.js')
       );
       this.fs.copy(
-        this.templatePath('app/allo-app/middleware.js'),
-        this.destinationPath('app/allo-app/middleware.js')
+        this.templatePath('project/allo-app/middleware.js'),
+        this.destinationPath('project/allo-app/middleware.js')
       );
       this.fs.copy(
-        this.templatePath('app/allo-app/urls.js'),
-        this.destinationPath('app/allo-app/urls.js')
+        this.templatePath('project/allo-app/urls.js'),
+        this.destinationPath('project/allo-app/urls.js')
       );
       this.fs.copyTpl(
-        this.templatePath('app/allo-app/views.js'),
-        this.destinationPath('app/allo-app/views.js'),
+        this.templatePath('project/allo-app/views.js'),
+        this.destinationPath('project/allo-app/views.js'),
         {
           appname: this.appname,
           includeBootstrap: this.includeBootstrap,
@@ -152,18 +152,18 @@ module.exports = yeoman.generators.Base.extend({
       );
       if (this.includeBootstrap) {
         this.fs.copy(
-          this.templatePath('app/allo-app/styles/main.scss'),
-          this.destinationPath('app/allo-app/styles/main.scss')
+          this.templatePath('project/allo-app/styles/main.scss'),
+          this.destinationPath('project/allo-app/styles/main.scss')
         );
       } else {
-        mkdirp('app/allo-app/styles');
+        mkdirp('project/allo-app/styles');
       }
     },
     alloAppMedia: function () {
-      mkdirp('app/allo-app/media/fonts');
+      mkdirp('project/allo-app/media/fonts');
       this.fs.copy(
-        this.templatePath('app/allo-app/media/images/yeoman.png'),
-        this.destinationPath('app/allo-app/media/images/yeoman.png')
+        this.templatePath('project/allo-app/media/images/yeoman.png'),
+        this.destinationPath('project/allo-app/media/images/yeoman.png')
       );
     }
   },
