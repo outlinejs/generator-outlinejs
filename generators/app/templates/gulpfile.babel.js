@@ -8,6 +8,8 @@ import browserify from 'browserify';
 import {stream as wiredep} from 'wiredep';
 import vinylSource from 'vinyl-source-stream';
 import vinylBuffer from 'vinyl-buffer';
+import gettext from 'gulp-gettext-parser';
+import po2json from 'gulp-po2json';
 import plumber from 'gulp-plumber'; //why not using $? Easy: because for some reason is not loaded by gulp load plugins
 import eslint from 'gulp-eslint'; //why not using $? Easy: because for some reason is not loaded by gulp load plugins
 import useref from 'gulp-useref'; //why not using $? Easy: because for some reason is not loaded by gulp load plugins
@@ -18,15 +20,13 @@ import gsize from 'gulp-size'; //why not using $? Easy: because for some reason 
 
 const $ = gulpLoadPlugins();
 const reload = browserSync.reload;
-const bundler = watchify(browserify(
-    Object.assign({}, watchify.args, {
-      entries: ['./project/main.js'],
-      debug: true
-    })
-  )
+let bundler = browserify(
+  Object.assign({}, watchify.args, {
+    entries: ['./project/main.js'],
+    debug: true
+  })
 );
 
-bundler.on('update', rebundle);
 bundler.on('log', $.util.log);
 
 function rebundle() {
@@ -45,6 +45,19 @@ function rebundle() {
 
 gulp.task('js', rebundle);
 
+gulp.task('pot', () => {
+  return gulp.src('project/**/*.js')
+    .pipe(gettext({}))
+    .pipe($.rename('template.pot'))
+    .pipe(gulp.dest('locale/'));
+});
+
+gulp.task('locale-build', () => {
+  return gulp.src('locale/*.po')
+    .pipe(po2json({ format: 'jed1.x' }))
+    .pipe(gulp.dest('.tmp/locale'))
+    .pipe(gulp.dest('dist/locale'));
+});
 
 gulp.task('styles', () => {
   return gulp.src('project/**/styles/*.scss')
@@ -138,31 +151,37 @@ gulp.task('extras', () => {
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
-gulp.task('serve', ['styles', 'js', 'fonts'], () => {
-  browserSync({
-    notify: false,
-    port: 9000,
-    server: {
-      baseDir: ['.tmp', 'project'],
-      routes: {
-        '/bower_components': 'bower_components',
-        '/static': 'project',
-        '/static/vendor-fonts/': '.tmp/static/vendor-fonts'
-      }
-    }
-  });
-
+gulp.task('serve', ['styles', 'fonts', 'pot', 'locale-build'], () => {
   gulp.watch([
     'project/*.html',
-    '.tmp/scripts/**/*.js',
     'project/**/media/fonts/**/*',
     '.tmp/static/vendor-fonts/**/*',
-    '.tmp/styles/**/*'
+    '.tmp/styles/**/*',
+    '.tmp/locale/*.json'
   ]).on('change', reload);
+
+  bundler = watchify(bundler);
+  bundler.on('update', rebundle);
+  rebundle().once('end', () => {
+    browserSync({
+      notify: false,
+      port: 9000,
+      server: {
+        baseDir: ['.tmp', 'project'],
+        routes: {
+          '/bower_components': 'bower_components',
+          '/static': 'project',
+          '/static/vendor-fonts/': '.tmp/static/vendor-fonts'
+        }
+      }
+    });
+  });
 
   gulp.watch('project/**/styles/*.scss', ['styles']);
   gulp.watch('project/**/media/fonts/**/*', ['apps-fonts']);
   gulp.watch('bower.json', ['wiredep', 'vendor-fonts']);
+  gulp.watch('project/**/*.js', ['pot']);
+  gulp.watch('locale/*.po', ['locale-build']);
 });
 
 gulp.task('serve:dist', () => {
@@ -209,7 +228,7 @@ gulp.task('wiredep', () => {
     .pipe(gulp.dest('project'));
 });
 
-gulp.task('build', ['lint', 'html', 'images', 'fonts', 'extras'], () => {
+gulp.task('build', ['lint', 'html', 'images', 'fonts', 'extras', 'locale-build'], () => {
   return gulp.src('dist/**/*').pipe(gsize({title: 'build', gzip: true}));
 });
 
