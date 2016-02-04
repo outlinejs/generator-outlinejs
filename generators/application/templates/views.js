@@ -8,7 +8,7 @@ export class MyLayoutView extends BaseView {
 
     return <div>
       <h1>{ gettext('<%= applicationName %> - layout') }</h1>
-      <Content { ...this.props.contentProps } controller={ this.controller } />
+      <Content { ...this.props.contentProps } delegate={ this.delegate } />
     </div>;
   }
 }
