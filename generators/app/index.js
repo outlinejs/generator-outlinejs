@@ -141,6 +141,10 @@ module.exports = yeoman.generators.Base.extend({
         this.templatePath('project/allo-app/urls.js'),
         this.destinationPath('project/allo-app/urls.js')
       );
+      this.fs.copy(
+        this.templatePath('project/allo-app/tests/test.js'),
+        this.destinationPath('project/allo-app/tests/test.js')
+      );
       this.fs.copyTpl(
         this.templatePath('project/allo-app/views.js'),
         this.destinationPath('project/allo-app/views.js'),

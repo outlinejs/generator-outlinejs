@@ -47,6 +47,11 @@ module.exports = yeoman.generators.Base.extend({
         this.templatePath('styles/main.scss'),
         this.destinationPath(this.baseDir + 'styles/main.scss'));
   },
+  tests: function () {
+    this.fs.copy(
+        this.templatePath('tests/test.js'),
+        this.destinationPath(this.baseDir + 'tests/test.js'));
+  },
   modules: function () {
     this.fs.copyTpl(
         this.templatePath('controllers.js'),

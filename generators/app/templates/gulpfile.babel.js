@@ -17,6 +17,9 @@ import uglify from 'gulp-uglify'; //why not using $? Easy: because for some reas
 import cssnano from 'gulp-cssnano'; //why not using $? Easy: because for some reason is not loaded by gulp load plugins
 import htmlmin from 'gulp-htmlmin'; //why not using $? Easy: because for some reason is not loaded by gulp load plugins
 import gsize from 'gulp-size'; //why not using $? Easy: because for some reason is not loaded by gulp load plugins
+import mocaccino from 'mocaccino';
+import glob from 'glob';
+import phantomic from 'phantomic';
 
 const $ = gulpLoadPlugins();
 const reload = browserSync.reload;
@@ -87,14 +90,12 @@ function lint(files, options) {
   };
 }
 
-const testLintOptions = {
+gulp.task('lint', lint('project/**/*.js'));
+gulp.task('lint:test', lint('project/**/tests/*.js', {
   env: {
     mocha: true
   }
-};
-
-gulp.task('lint', lint('project/**/*.js'));
-gulp.task('lint:test', lint('test/spec/**/*.js', testLintOptions));
+}));
 
 gulp.task('html', ['js', 'styles'], () => {
   return gulp.src('project/*.html')
@@ -194,25 +195,6 @@ gulp.task('serve:dist', () => {
   });
 });
 
-//TODO: check config for testing
-gulp.task('serve:test', () => {
-  browserSync({
-    notify: false,
-    port: 9002,
-    ui: false,
-    server: {
-      baseDir: 'test',
-      routes: {
-        '/scripts': 'project',
-        '/bower_components': 'bower_components'
-      }
-    }
-  });
-
-  gulp.watch('test/spec/**/*.js').on('change', reload);
-  gulp.watch('test/spec/**/*.js', ['lint:test']);
-});
-
 // inject bower components
 gulp.task('wiredep', () => {
   gulp.src('project/styles/*.scss')
@@ -228,10 +210,29 @@ gulp.task('wiredep', () => {
     .pipe(gulp.dest('project'));
 });
 
-gulp.task('build', ['lint', 'html', 'images', 'fonts', 'extras', 'locale-build'], () => {
+gulp.task('test', ['lint:test'], () => {
+  var files = glob.sync('project/**/tests/*.js');
+  var b = browserify({entries: files})
+    .plugin(mocaccino, {reporter: 'spec'})
+    .bundle();
+
+  phantomic(b, {
+    debug: false,
+    port: 0,
+    brout: true,
+    'web-security': false,
+    'ignore-ssl-errors': true
+  }, function (code) {
+    if (code !== 0) {
+      process.exit(code);
+    }
+  }).pipe(process.stdout);
+});
+
+gulp.task('build', ['lint', 'test', 'html', 'images', 'fonts', 'extras', 'locale-build'], () => {
   return gulp.src('dist/**/*').pipe(gsize({title: 'build', gzip: true}));
 });
 
-gulp.task('default', ['clean'], function () {
+gulp.task('default', ['clean'], () => {
   gulp.start('build');
 });
