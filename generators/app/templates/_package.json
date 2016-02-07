@@ -44,7 +44,7 @@
   "dependencies": {<% if (includeModernizr) { %>
     "modernizr": "^3.2.0",<% } if (includeBootstrap) { %>
     "bootstrap-sass": "^3.3.6",<% } %>
-    "outlinejs": "^1.0.6",
+    "outlinejs": "^1.1.0",
     "backbone": "^1.2.3",
     "jquery": "^2.1.4",
     "react": "^0.14.5",
