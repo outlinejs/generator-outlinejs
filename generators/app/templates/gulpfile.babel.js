@@ -20,19 +20,12 @@ import gsize from 'gulp-size'; //why not using $? Easy: because for some reason 
 import mocaccino from 'mocaccino';
 import glob from 'glob';
 import phantomic from 'phantomic';
+import nodemon from 'gulp-nodemon';
 
 const $ = gulpLoadPlugins();
 const reload = browserSync.reload;
-let bundler = browserify(
-  Object.assign({}, watchify.args, {
-    entries: ['./project/main.js'],
-    debug: true
-  })
-);
 
-bundler.on('log', $.util.log);
-
-function rebundle() {
+function jsbundle(bundler) {
   return bundler.bundle()
     // log errors if they happen
     .on('error', $.util.log.bind($.util, 'Browserify Error'))
@@ -46,7 +39,38 @@ function rebundle() {
     });
 }
 
-gulp.task('js', rebundle);
+gulp.task('js:watch', () => {
+  var bundler = watchify(browserify(
+    Object.assign({}, watchify.args, {
+      entries: ['./project/main.js'],
+      debug: true
+    })
+  ));
+  bundler.on('log', $.util.log);
+  bundler.on('update', () => {
+    jsbundle(bundler);
+  });
+  return jsbundle(bundler);
+});
+
+gulp.task('js:build', () => {
+  var bundler = browserify({entries: ['./project/main.js']});
+  bundler.on('log', $.util.log);
+  return jsbundle(bundler);
+});
+
+gulp.task('js:build-node', () => {
+  var bundler = browserify({entries: ['./project/main.js']})
+    .exclude('http')
+    .exclude('url')
+    .exclude('fs')
+    .exclude('querystring')
+    .exclude('buffer')
+    .exclude('console-browserify');
+  bundler.on('log', $.util.log);
+  return jsbundle(bundler)
+    .pipe(gulp.dest('./dist/node-scripts'));
+});
 
 gulp.task('pot', () => {
   return gulp.src('project/**/*.js')
@@ -97,7 +121,7 @@ gulp.task('lint:test', lint('project/**/tests/*.js', {
   }
 }));
 
-gulp.task('html', ['js', 'styles'], () => {
+gulp.task('html', ['js:build', 'styles'], () => {
   return gulp.src('project/*.html')
     .pipe(useref({searchPath: ['.tmp', '.']}))
     .pipe($.if('*.js', uglify()))
@@ -152,7 +176,7 @@ gulp.task('extras', () => {
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
-gulp.task('serve', ['styles', 'fonts', 'pot', 'locale-build'], () => {
+gulp.task('serve', ['js:watch', 'styles', 'fonts', 'pot', 'locale-build'], () => {
   gulp.watch([
     'project/*.html',
     'project/**/media/fonts/**/*',
@@ -161,21 +185,17 @@ gulp.task('serve', ['styles', 'fonts', 'pot', 'locale-build'], () => {
     '.tmp/locale/*.json'
   ]).on('change', reload);
 
-  bundler = watchify(bundler);
-  bundler.on('update', rebundle);
-  rebundle().once('end', () => {
-    browserSync({
-      notify: false,
-      port: 9000,
-      server: {
-        baseDir: ['.tmp', 'project'],
-        routes: {
-          '/bower_components': 'bower_components',
-          '/static': 'project',
-          '/static/vendor-fonts/': '.tmp/static/vendor-fonts'
-        }
+  browserSync({
+    notify: false,
+    port: 9000,
+    server: {
+      baseDir: ['.tmp', 'project'],
+      routes: {
+        '/bower_components': 'bower_components',
+        '/static': 'project',
+        '/static/vendor-fonts/': '.tmp/static/vendor-fonts'
       }
-    });
+    }
   });
 
   gulp.watch('project/**/styles/*.scss', ['styles']);
@@ -191,6 +211,27 @@ gulp.task('serve:dist', () => {
     port: 9001,
     server: {
       baseDir: ['dist']
+    }
+  });
+});
+
+gulp.task('serve:node', ['nodemon'], () => {
+  browserSync({
+    notify: false,
+    proxy: 'http://localhost:1337',
+    serveStatic: ['./dist/'],
+    port: 9002
+  });
+});
+
+gulp.task('nodemon', ['build'], (cb) => {
+  var started = false;
+  return nodemon({
+    script: './dist/node-scripts/main.js'
+  }).on('start', function () {
+    if (!started) {
+      cb();
+      started = true;
     }
   });
 });
@@ -229,7 +270,7 @@ gulp.task('test', ['lint:test'], () => {
   }).pipe(process.stdout);
 });
 
-gulp.task('build', ['lint', 'test', 'html', 'images', 'fonts', 'extras', 'locale-build'], () => {
+gulp.task('build', ['lint', 'test', 'js:build-node', 'html', 'images', 'fonts', 'extras', 'locale-build'], () => {
   return gulp.src('dist/**/*').pipe(gsize({title: 'build', gzip: true}));
 });
 
