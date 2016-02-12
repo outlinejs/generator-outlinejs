@@ -2,7 +2,6 @@ import { BaseView } from 'outlinejs/views';
 import { BaseComponent } from 'outlinejs/components';
 import React from 'react';
 import { RouteUtils } from 'outlinejs/routers';
-<% if (includeBootstrap) { %>import 'bootstrap';<% } %>
 
 class MenuView extends BaseComponent {
   render() {

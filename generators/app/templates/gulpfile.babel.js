@@ -39,6 +39,15 @@ function jsbundle(bundler) {
     });
 }
 
+function nodebundle(bundler) {
+  return bundler.bundle()
+    // log errors if they happen
+    .on('error', $.util.log.bind($.util, 'Browserify Error'))
+    .pipe(vinylSource('main.js'))
+    .pipe(vinylBuffer())
+    .pipe(gulp.dest('./dist/node-scripts'))
+}
+
 gulp.task('js:watch', () => {
   var bundler = watchify(browserify(
     Object.assign({}, watchify.args, {
@@ -68,8 +77,7 @@ gulp.task('js:build-node', () => {
     .exclude('buffer')
     .exclude('console-browserify');
   bundler.on('log', $.util.log);
-  return jsbundle(bundler)
-    .pipe(gulp.dest('./dist/node-scripts'));
+  return nodebundle(bundler);
 });
 
 gulp.task('pot', () => {
