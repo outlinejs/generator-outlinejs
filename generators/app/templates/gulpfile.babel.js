@@ -221,6 +221,9 @@ gulp.task('env', (cb) => {
       safeEnv[k.replace(safeRegEx, '')] = env[k];
     }
   }
+  try {
+    fs.mkdirSync('./.tmp/');
+  } catch(ex) { }
   fs.writeFile('./.tmp/env.json', JSON.stringify(safeEnv), (err) => {
     if (err) {
       $.util.log(err);

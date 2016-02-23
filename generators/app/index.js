@@ -107,8 +107,8 @@ module.exports = yeoman.generators.Base.extend({
       var bsPath;
 
       this.fs.copyTpl(
-        this.templatePath('project/index.html'),
-        this.destinationPath('project/index.html'),
+        this.templatePath('project/main.html'),
+        this.destinationPath('project/main.html'),
         {
           appname: this.appname,
           includeBootstrap: this.includeBootstrap,
