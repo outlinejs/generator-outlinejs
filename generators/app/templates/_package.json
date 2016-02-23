@@ -40,7 +40,11 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.6.1",
-    "wiredep": "^3.0.0"
+    "wiredep": "^3.0.0",
+    "http-proxy": "^1.13.2",
+    "merge2": "^1.0.1",
+    "nconf": "^0.8.4",
+    "partialify": "^3.1.6"
   },
   "dependencies": {<% if (includeModernizr) { %>
     "modernizr": "^3.2.0",<% } if (includeBootstrap) { %>
@@ -54,7 +58,8 @@
   "browserify": {
     "transform": [
       "babelify",
-      "browserify-shim"
+      "browserify-shim",
+      "partialify"
     ]
   },
   "browser": {<% if (includeBootstrap) { %>

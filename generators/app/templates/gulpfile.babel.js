@@ -21,63 +21,79 @@ import mocaccino from 'mocaccino';
 import glob from 'glob';
 import phantomic from 'phantomic';
 import nodemon from 'gulp-nodemon';
+import merge2 from 'merge2';
+import httpProxy from 'http-proxy';
+import nconf from 'nconf';
+import fs from 'fs';
 
 const $ = gulpLoadPlugins();
 const reload = browserSync.reload;
 
-function jsbundle(bundler) {
-  return bundler.bundle()
-    // log errors if they happen
-    .on('error', $.util.log.bind($.util, 'Browserify Error'))
-    .pipe(vinylSource('main.js'))
-    .pipe(vinylBuffer())
-    .pipe($.sourcemaps.init({loadMaps: true}))
-    .pipe($.sourcemaps.write('./')) // writes .map file
-    .pipe(gulp.dest('./.tmp/scripts'))
-    .on('end', function () {
-      reload();
-    });
-}
-
-function nodebundle(bundler) {
-  return bundler.bundle()
-    // log errors if they happen
-    .on('error', $.util.log.bind($.util, 'Browserify Error'))
-    .pipe(vinylSource('main.js'))
-    .pipe(vinylBuffer())
-    .pipe(gulp.dest('./dist/node-scripts'))
-}
-
-gulp.task('js:watch', () => {
-  var bundler = watchify(browserify(
-    Object.assign({}, watchify.args, {
+function getBrowserify(debug = false, forNode = false, watch = false) {
+  var b = browserify(
+    Object.assign({}, watch ? watchify.args : {}, {
       entries: ['./project/main.js'],
-      debug: true
+      debug: debug
     })
-  ));
-  bundler.on('log', $.util.log);
-  bundler.on('update', () => {
-    jsbundle(bundler);
+  );
+  b.on('log', $.util.log);
+  if (forNode) {
+    b = b
+      .require('./.tmp/main.html', {expose: '__main.html'})
+      .exclude('http')
+      .exclude('url')
+      .exclude('fs')
+      .exclude('querystring')
+      .exclude('buffer')
+      .exclude('console-browserify');
+  }
+  b = b.exclude('__main.html');
+  //include env
+  b = b.require('./.tmp/env.json', {expose: '__outlineEnv'});
+  if (watch) {
+    b = watchify(b);
+  }
+  return b;
+}
+
+function browserifyBundle(b, clientMode = true) {
+  var bundle = b.bundle()
+    .on('error', $.util.log.bind($.util, 'Browserify Error'))
+    .pipe(vinylSource('main.js'))
+    .pipe(vinylBuffer());
+  if (clientMode) {
+    bundle = bundle
+      .pipe($.sourcemaps.init({loadMaps: true}))
+      .pipe($.sourcemaps.write('./')) // writes .map file
+      .pipe(gulp.dest('./.tmp/scripts'))
+      .on('end', function () {
+        reload();
+      });
+  } else {
+    bundle = bundle
+      .pipe(gulp.dest('./.tmp/node-scripts'));
+  }
+  return bundle;
+}
+
+gulp.task('js:build', ['node-html', 'env'], () => {
+  var clientBundle = browserifyBundle(getBrowserify());
+  var serverBundle = browserifyBundle(getBrowserify(false, true, false), false);
+  return merge2(clientBundle, serverBundle);
+});
+
+gulp.task('js:watch', ['node-html', 'env'], () => {
+  var bc = getBrowserify(true, false, true);
+  var bs = getBrowserify(true, true, true);
+  var clientBundle = browserifyBundle(bc);
+  var serverBundle = browserifyBundle(bs, false);
+  bc.on('update', () => {
+    browserifyBundle(bc);
   });
-  return jsbundle(bundler);
-});
-
-gulp.task('js:build', () => {
-  var bundler = browserify({entries: ['./project/main.js']});
-  bundler.on('log', $.util.log);
-  return jsbundle(bundler);
-});
-
-gulp.task('js:build-node', () => {
-  var bundler = browserify({entries: ['./project/main.js']})
-    .exclude('http')
-    .exclude('url')
-    .exclude('fs')
-    .exclude('querystring')
-    .exclude('buffer')
-    .exclude('console-browserify');
-  bundler.on('log', $.util.log);
-  return nodebundle(bundler);
+  bs.on('update', () => {
+    browserifyBundle(bs, false);
+  });
+  return merge2(clientBundle, serverBundle);
 });
 
 gulp.task('pot', () => {
@@ -138,6 +154,19 @@ gulp.task('html', ['js:build', 'styles'], () => {
     .pipe(gulp.dest('dist'));
 });
 
+gulp.task('node-app', ['js:build'], () => {
+  return gulp.src('.tmp/node-scripts/*.js')
+    .pipe(uglify())
+    .pipe(gulp.dest('dist/node-scripts'));
+});
+
+gulp.task('node-html', () => {
+  return gulp.src('project/main.html')
+    .pipe(useref({searchPath: ['.tmp', '.'], noAssets: true}))
+    .pipe(htmlmin({collapseWhitespace: true}))
+    .pipe(gulp.dest('.tmp'));
+});
+
 gulp.task('images', () => {
   return gulp.src('project/**/images/**/*')
     .pipe($.if($.if.isFile, $.cache($.imagemin({
@@ -182,9 +211,34 @@ gulp.task('extras', () => {
   }).pipe(gulp.dest('dist'));
 });
 
+gulp.task('env', (cb) => {
+  //only env vars with BROWSER_ prefix are exposed
+  var safeRegEx = new RegExp('^BROWSER_');
+  var env = nconf.env().stores.env.store;
+  var safeEnv = {};
+  for (var k of Object.keys(env)) {
+    if (safeRegEx.test(k)) {
+      safeEnv[k.replace(safeRegEx, '')] = env[k];
+    }
+  }
+  fs.writeFile('./.tmp/env.json', JSON.stringify(safeEnv), (err) => {
+    if (err) {
+      $.util.log(err);
+    }
+    cb();
+  });
+});
+
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
 gulp.task('serve', ['js:watch', 'styles', 'fonts', 'pot', 'locale-build'], () => {
+  gulp.watch('project/**/styles/*.scss', ['styles']);
+  gulp.watch('project/**/media/fonts/**/*', ['apps-fonts']);
+  gulp.watch('bower.json', ['wiredep', 'vendor-fonts']);
+  gulp.watch('package.json', ['vendor-fonts']); //TODO: and other tasks :)
+  gulp.watch('project/**/*.js', ['pot']);
+  gulp.watch('locale/*.po', ['locale-build']);
+
   gulp.watch([
     'project/*.html',
     'project/**/media/fonts/**/*',
@@ -193,54 +247,57 @@ gulp.task('serve', ['js:watch', 'styles', 'fonts', 'pot', 'locale-build'], () =>
     '.tmp/locale/*.json'
   ]).on('change', reload);
 
-  browserSync({
-    notify: false,
-    port: 9000,
-    server: {
-      baseDir: ['.tmp', 'project'],
-      routes: {
-        '/bower_components': 'bower_components',
-        '/static': 'project',
-        '/static/vendor-fonts/': '.tmp/static/vendor-fonts'
-      }
+  var nmStarted = false;
+
+  nodemon({
+    script: './.tmp/node-scripts/main.js',
+    watch: './.tmp/node-scripts/',
+    ext: 'js',
+    delay: 1000
+  }).on('start', function () {
+    if (!nmStarted) {
+      nmStarted = true;
+      var proxy = httpProxy.createProxyServer({
+        target: 'http://localhost:1337/'
+      }).on('error', (err) => {
+        $.util.log(err);
+      });
+      setTimeout(() => {
+        browserSync({
+          notify: false,
+          port: 9000,
+          server: {
+            baseDir: ['.tmp', 'project'],
+            routes: {
+              '/bower_components': 'bower_components',
+              '/static': 'project',
+              '/static/vendor-fonts/': '.tmp/static/vendor-fonts'
+            },
+            middleware: (req, res, next) => {
+              if (!/(\/scripts)|(\/styles)|(\/static)|(\/bower_components)/.test(req.url)) {
+                proxy.web(req, res);
+              } else {
+                next();
+              }
+            }
+          }
+        });
+      }, 2000);
     }
   });
-
-  gulp.watch('project/**/styles/*.scss', ['styles']);
-  gulp.watch('project/**/media/fonts/**/*', ['apps-fonts']);
-  gulp.watch('bower.json', ['wiredep', 'vendor-fonts']);
-  gulp.watch('project/**/*.js', ['pot']);
-  gulp.watch('locale/*.po', ['locale-build']);
 });
 
 gulp.task('serve:dist', () => {
-  browserSync({
-    notify: false,
-    port: 9001,
-    server: {
-      baseDir: ['dist']
-    }
-  });
-});
-
-gulp.task('serve:node', ['nodemon'], () => {
-  browserSync({
-    notify: false,
-    proxy: 'http://localhost:1337',
-    serveStatic: ['./dist/'],
-    port: 9002
-  });
-});
-
-gulp.task('nodemon', ['build'], (cb) => {
-  var started = false;
   return nodemon({
-    script: './dist/node-scripts/main.js'
+    script: './dist/node-scripts/main.js',
+    watch: './dist/node-scripts/'
   }).on('start', function () {
-    if (!started) {
-      cb();
-      started = true;
-    }
+    browserSync({
+      notify: false,
+      proxy: 'http://localhost:1337',
+      serveStatic: ['./dist/'],
+      port: 9001
+    });
   });
 });
 
@@ -278,7 +335,7 @@ gulp.task('test', ['lint:test'], () => {
   }).pipe(process.stdout);
 });
 
-gulp.task('build', ['lint', 'test', 'js:build-node', 'html', 'images', 'fonts', 'extras', 'locale-build'], () => {
+gulp.task('build', ['lint', 'test', 'html', 'node-app', 'images', 'fonts', 'extras', 'locale-build'], () => {
   return gulp.src('dist/**/*').pipe(gsize({title: 'build', gzip: true}));
 });
 

@@ -2,16 +2,25 @@ import { BaseLayoutController } from 'outlinejs/controllers';
 import { MyLayoutView, MyContentView } from './views';
 import { UserCollection } from './managers';
 import { gettext } from 'outlinejs/utils/translation';
+import { runtime } from 'outlinejs/contexts';
 
 export class MyController extends BaseLayoutController {
   static get loginRequired() {
     return false;
   }
 
+  get layoutView() {
+    return MyLayoutView;
+  }
+
+  get view() {
+    return MyContentView;
+  }
+
   init() {
-    this.layoutView = MyLayoutView;
-    this.view = MyContentView;
-    this.render({ myVar: gettext('Loading users ...') });
+    if (runtime.isClient && !this.isViewRendered) {
+      this.render({ myVar: gettext('Loading users ...') });
+    }
 
     var users = new UserCollection();
     users.fetch().then(() => {
