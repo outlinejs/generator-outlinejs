@@ -41,6 +41,7 @@ function getBrowserify(debug = false, forNode = false, watch = false) {
     b = b
       .require('./.tmp/main.html', {expose: '__main.html'})
       .exclude('http')
+      .exclude('https')
       .exclude('url')
       .exclude('fs')
       .exclude('querystring')
