@@ -1,4 +1,4 @@
-import { BaseSettings } from 'outlinejs/conf';
+import { BaseSettings } from 'outlinejs/lib/conf';
 
 export default class extends BaseSettings {
   get MIDDLEWARE() {

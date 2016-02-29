@@ -1,4 +1,4 @@
-import { BaseModel } from 'outlinejs/models';
+import { BaseModel } from 'outlinejs/lib/models';
 
 export class User extends BaseModel {
   get id() {

@@ -1,5 +1,5 @@
 import { AlloController, AlloDetailController } from './controllers';
-import { BaseRouter, url } from 'outlinejs/routers';
+import { BaseRouter, url } from 'outlinejs/lib/routers';
 
 export default class extends BaseRouter {
   get urlPatterns() {
