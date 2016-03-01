@@ -31,13 +31,10 @@
     ]
   },
   "browser": {<% if (includeBootstrap) { %>
-    "bootstrap": "./node_modules/bootstrap-sass/assets/javascripts/bootstrap.js"
+    "bootstrap": "./node_modules/bootstrap-sass/assets/javascripts/bootstrap.js",
+    "jquery": "./node_modules/jquery/dist/jquery.js"
   <% } %>},
   "browserify-shim": {<% if (includeBootstrap) { %>
-    "bootstrap": {
-      "depends": [
-        "jquery:jQuery"
-      ]
-    }
+    "jquery": "jQuery"
   <% } %>}
 }
