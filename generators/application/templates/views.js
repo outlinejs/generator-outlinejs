@@ -1,13 +1,12 @@
 import { BaseView } from 'outlinejs/lib/views';
 import React from 'react';
-import { gettext } from 'outlinejs/lib/utils/translation';
 
 export class MyLayoutView extends BaseView {
   render() {
     var Content = this.props.content;
 
     return <div>
-      <h1>{ gettext('<%= applicationName %> - layout') }</h1>
+      <h1>{ this.i18n.gettext('<%= applicationName %> - layout') }</h1>
       <Content { ...this.props.contentProps } delegate={ this.delegate } />
     </div>;
   }

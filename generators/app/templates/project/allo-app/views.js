@@ -6,8 +6,8 @@ import { RouteUtils, Link } from 'outlinejs/lib/routers';
 class MenuView extends BaseComponent {
   render() {
     return <ul className="nav nav-pills pull-right">
-      <li className={RouteUtils.isState('allo:home')}><Link state="allo:home">Home</Link></li>
-      <li className={RouteUtils.isState('allo:other')}><Link state="allo:other" params={{detailId: 1}}>Other Page</Link></li>
+      <li className={RouteUtils.activeCssClass(this.request, 'allo:home')}><Link state="allo:home">Home</Link></li>
+      <li className={RouteUtils.activeCssClass(this.request, 'allo:other')}><Link state="allo:other" params={{detailId: 1}}>Other Page</Link></li>
     </ul>;
   }
 }

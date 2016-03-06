@@ -1,7 +1,6 @@
 import { BaseLayoutController } from 'outlinejs/lib/controllers';
 import { MyLayoutView, MyContentView } from './views';
 import { UserCollection } from './managers';
-import { gettext } from 'outlinejs/lib/utils/translation';
 import { runtime } from 'outlinejs/lib/contexts';
 
 export class MyController extends BaseLayoutController {
@@ -19,16 +18,16 @@ export class MyController extends BaseLayoutController {
 
   async loadUsers(users) {
     try {
-      this.render({ myVar: gettext('Users loaded ...'), users: await users.all() });
+      this.render({ myVar: this.i18n.gettext('Users loaded ...'), users: await users.all() });
     } catch (ex) {
-      this.render({ myVar: gettext('Users not loaded!!!') });
+      this.render({ myVar: this.i18n.gettext('Users not loaded!!!') });
       console.log(ex);
     }
   }
 
   init() {
     if (runtime.isClient && !this.isViewRendered) {
-      this.render({ myVar: gettext('Loading users ...') });
+      this.render({ myVar: this.i18n.gettext('Loading users ...') });
     }
 
     var users = new UserCollection();

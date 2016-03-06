@@ -8,7 +8,6 @@ class GulpTasks extends OutlineJsTasks {
   getBrowserify(debug = false, forNode = false, watch = false, files = [this.projectJsEntry]) {
     var b = super.getBrowserify(debug, forNode, watch, files);
     if (forNode) {
-      //
       b = b.exclude('jquery');
     }
     return b;
