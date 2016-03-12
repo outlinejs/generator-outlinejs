@@ -1,5 +1,7 @@
 import { BaseCollection } from 'outlinejs/lib/managers';
+
 import { User } from './models';
+
 
 export class UserCollection extends BaseCollection {
   get url() {

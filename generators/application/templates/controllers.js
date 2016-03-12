@@ -1,7 +1,9 @@
 import { BaseLayoutController } from 'outlinejs/lib/controllers';
+import { runtime } from 'outlinejs/lib/contexts';
+
 import { MyLayoutView, MyContentView } from './views';
 import { UserCollection } from './managers';
-import { runtime } from 'outlinejs/lib/contexts';
+
 
 export class MyController extends BaseLayoutController {
   static get loginRequired() {

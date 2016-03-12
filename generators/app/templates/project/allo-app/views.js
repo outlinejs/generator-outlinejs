@@ -1,7 +1,9 @@
+import React from 'react';
+
 import { BaseView } from 'outlinejs/lib/views';
 import { BaseComponent } from 'outlinejs/lib/components';
-import React from 'react';
 import { RouteUtils, Link } from 'outlinejs/lib/routers';
+
 
 class MenuView extends BaseComponent {
   render() {

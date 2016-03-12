@@ -1,5 +1,7 @@
 import { BaseController } from 'outlinejs/lib/controllers';
+
 import { AlloView, AlloDetailView } from './views';
+
 
 export class AlloController extends BaseController {
   static get loginRequired() {

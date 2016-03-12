@@ -1,5 +1,7 @@
-import { BaseView, BaseLayoutView } from 'outlinejs/lib/views';
 import React from 'react';
+
+import { BaseView, BaseLayoutView } from 'outlinejs/lib/views';
+
 
 export class MyLayoutView extends BaseLayoutView {
   render() {

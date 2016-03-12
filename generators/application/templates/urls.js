@@ -1,5 +1,7 @@
-import { MyController } from './controllers';
 import { BaseRouter, url } from 'outlinejs/lib/routers';
+
+import { MyController } from './controllers';
+
 
 export default class extends BaseRouter {
   get urlPatterns() {
