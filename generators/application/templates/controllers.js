@@ -1,11 +1,9 @@
-import { BaseLayoutController } from 'outlinejs/lib/controllers';
-import { runtime } from 'outlinejs/lib/contexts';
+import { controllers } from 'outlinejs';
 
 import { MyLayoutView, MyContentView } from './views';
-import { UserCollection } from './managers';
 
 
-export class MyController extends BaseLayoutController {
+export class MyController extends controllers.BaseLayoutController {
   static get loginRequired() {
     return false;
   }
@@ -18,21 +16,7 @@ export class MyController extends BaseLayoutController {
     return MyContentView;
   }
 
-  async loadUsers(users) {
-    try {
-      this.render({ myVar: this.i18n.gettext('Users loaded ...'), users: await users.all() });
-    } catch (ex) {
-      this.render({ myVar: this.i18n.gettext('Users not loaded!!!') });
-      console.log(ex);
-    }
-  }
-
   init() {
-    if (runtime.isClient && !this.isViewRendered) {
-      this.render({ myVar: this.i18n.gettext('Loading users ...') });
-    }
-
-    var users = new UserCollection();
-    this.loadUsers(users);
+    this.render();
   }
 }

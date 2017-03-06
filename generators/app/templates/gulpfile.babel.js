@@ -3,10 +3,10 @@ import gulp from 'gulp';
 import eslint from 'gulp-eslint';
 import browserify from 'browserify';
 
-import OutlineJsTasks from 'outlinejs/lib/utils/build/tasks';
+import DefaultTask from '@outlinejs/gulp-tasks';
 
 
-class GulpTasks extends OutlineJsTasks {
+class GulpTasks extends DefaultTask {
   getBrowserify(debug = false, forNode = false, watch = false, files = [this.projectJsEntry]) {
     var b = super.getBrowserify(debug, forNode, watch, files);
     if (forNode) {

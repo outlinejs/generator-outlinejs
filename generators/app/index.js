@@ -1,16 +1,16 @@
 'use strict';
-var yeoman = require('yeoman-generator');
+var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var yosay = require('yosay');
 var mkdirp = require('mkdirp');
 var _s = require('underscore.string');
 
-module.exports = yeoman.generators.Base.extend({
+module.exports = Generator.extend({
   initializing: function () {
     this.pkg = require('../../package.json');
   },
+  
   prompting: function () {
-    var done = this.async();
     this.appSlug = _s.slugify(this.appname);
 
     // Have Yeoman greet the user.
@@ -33,7 +33,7 @@ module.exports = yeoman.generators.Base.extend({
       }]
     }];
 
-    this.prompt(prompts, function (props) {
+    return this.prompt(prompts).then(function (props) {
       var features = props.features;
 
       function hasFeature(feat) {
@@ -42,10 +42,9 @@ module.exports = yeoman.generators.Base.extend({
 
       this.includeBootstrap = hasFeature('includeBootstrap');
       this.includeModernizr = hasFeature('includeModernizr');
-
-      done();
     }.bind(this));
   },
+
   writing: {
     packageJSON: function () {
       this.fs.copyTpl(

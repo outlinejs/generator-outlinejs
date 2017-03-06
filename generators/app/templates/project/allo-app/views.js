@@ -1,25 +1,27 @@
 import React from 'react';
 
-import { BaseView } from 'outlinejs/lib/views';
-import { BaseComponent } from 'outlinejs/lib/components';
-import { RouteUtils, Link } from 'outlinejs/lib/routers';
+import { views } from 'outlinejs';
+import { components } from 'outlinejs';
+import { routing } from 'outlinejs'
+
+let Link = components.Link;
 
 
-class MenuView extends BaseComponent {
+class MenuView extends components.BaseComponent {
   render() {
     return <ul className="nav nav-pills pull-right">
-      <li className={RouteUtils.activeCssClass(this.request, 'allo:home')}><Link state="allo:home">Home</Link></li>
-      <li className={RouteUtils.activeCssClass(this.request, 'allo:other')}><Link state="allo:other" params={{detailId: 1}}>Other Page</Link></li>
+      <li className={routing.Utils.activeCssClass(this.request, 'allo:home')}><Link state="allo:home">Home</Link></li>
+      <li className={routing.Utils.activeCssClass(this.request, 'allo:other')}><Link state="allo:other" params={{detailId: 1}}>Other Page</Link></li>
     </ul>;
   }
 }
 
-export class AlloView extends BaseView {
+export class AlloView extends views.BaseView {
   render() {
     return <div className="container">
       <div className="header">
         <MenuView />
-        <h3 className="text-muted"><%= appname %></h3>
+        <h3 className="text-muted">pippo</h3>
       </div>
 
       <div className="jumbotron">
@@ -33,11 +35,9 @@ export class AlloView extends BaseView {
           <h4>HTML5 Boilerplate</h4>
           <p>HTML5 Boilerplate is a professional front-end template for building fast, robust, and adaptable web apps or sites.</p>
           <h4>Sass</h4>
-          <p>Sass is the most mature, stable, and powerful professional grade CSS extension language in the world.</p><% if (includeBootstrap) { %>
+          <p>Sass is the most mature, stable, and powerful professional grade CSS extension language in the world.</p>
           <h4>Bootstrap</h4>
-          <p>Sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development.</p><% } %><% if (includeModernizr) { %>
-          <h4>Modernizr</h4>
-          <p>Modernizr is an open-source JavaScript library that helps you build the next generation of HTML5 and CSS3-powered websites.</p><% } %>
+          <p>Sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development.</p>
         </div>
       </div>
 
@@ -48,12 +48,12 @@ export class AlloView extends BaseView {
   }
 }
 
-export class AlloDetailView extends BaseView {
+export class AlloDetailView extends views.BaseView {
   render() {
     return <div className="container">
       <div className="header">
         <MenuView />
-        <h3 className="text-muted"><%= appname %></h3>
+        <h3 className="text-muted">pippo</h3>
       </div>
 
       <div className="jumbotron">
@@ -67,7 +67,7 @@ export class AlloDetailView extends BaseView {
           <p>
             Say 'allo to another page with a parameter id equal to <strong>{this.props.detail}</strong>
           </p>
-          <img src="/static/allo-app/media/images/yeoman.png" />
+          <img src={this.static('allo-app/media/images/yeoman.png')} />
         </div>
       </div>
 

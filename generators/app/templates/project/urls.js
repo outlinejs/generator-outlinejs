@@ -1,12 +1,13 @@
-import { BaseRouter, include } from 'outlinejs/lib/routers';
+import { routers } from 'outlinejs';
+import { routing } from 'outlinejs';
 
 import AlloAppRouter from './allo-app/urls';
 
 
-export default class extends BaseRouter {
-  get urlPatterns() {
+export default class extends routers.BaseRouter {
+  static get urlPatterns() {
     return {
-      '': include(AlloAppRouter)
+      '': routing.include(AlloAppRouter)
     };
   }
 }

@@ -1,10 +1,10 @@
 'use strict';
-var yeoman = require('yeoman-generator');
+var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var yosay = require('yosay');
 var _s = require('underscore.string');
 
-module.exports = yeoman.generators.Base.extend({
+module.exports = Generator.extend({
   prompting: function () {
     var done = this.async();
 
@@ -25,7 +25,7 @@ module.exports = yeoman.generators.Base.extend({
       }
     }];
 
-    this.prompt(prompts, function (props) {
+    return this.prompt(prompts).then(function (props) {
       this.applicationName = props.applicationName.trim();
       this.applicationSlug = _s.slugify(this.applicationName);
       this.baseDir = 'project/' + this.applicationSlug + '/';
@@ -57,14 +57,8 @@ module.exports = yeoman.generators.Base.extend({
         this.templatePath('controllers.js'),
         this.destinationPath(this.baseDir + 'controllers.js'));
     this.fs.copyTpl(
-        this.templatePath('managers.js'),
-        this.destinationPath(this.baseDir + 'managers.js'));
-    this.fs.copyTpl(
         this.templatePath('middleware.js'),
         this.destinationPath(this.baseDir + 'middleware.js'));
-    this.fs.copyTpl(
-        this.templatePath('models.js'),
-        this.destinationPath(this.baseDir + 'models.js'));
     this.fs.copyTpl(
         this.templatePath('urls.js'),
         this.destinationPath(this.baseDir + 'urls.js'),

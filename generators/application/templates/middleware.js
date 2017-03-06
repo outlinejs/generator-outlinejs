@@ -1,5 +1,5 @@
 export default class {
-  preControllerInit() {
+  processRequest(request, response) {
     return new Promise((resolve, reject) => {
       try {
         resolve();

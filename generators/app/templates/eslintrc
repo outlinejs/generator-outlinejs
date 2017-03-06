@@ -57,6 +57,7 @@
       2,
       "always"
     ],
+    "keyword-spacing": 2,
     "space-before-function-paren": [
       2,
       {

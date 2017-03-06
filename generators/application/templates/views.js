@@ -1,9 +1,8 @@
 import React from 'react';
+import { views } from 'outlinejs';
 
-import { BaseView, BaseLayoutView } from 'outlinejs/lib/views';
 
-
-export class MyLayoutView extends BaseLayoutView {
+export class MyLayoutView extends views.BaseLayoutView {
   render() {
     return <div>
       <h1>{ this.i18n.gettext('<%= applicationName %> - layout') }</h1>
@@ -12,24 +11,10 @@ export class MyLayoutView extends BaseLayoutView {
   }
 }
 
-export class MyContentView extends BaseView {
+export class MyContentView extends views.BaseView {
   render() {
-    var users;
-    if (this.props.users) {
-      users = <ul>
-        {
-          this.props.users.map((user) => {
-            return <li key={ user.id }>
-              <a href={`mailto:${user.email}`}>{ user.displayName }</a>
-            </li>;
-          })
-        }
-      </ul>;
-    }
-
     return <div>
-      <p>{ this.props.myVar }</p>
-      { users }
+      View content
     </div>;
   }
 }

@@ -1,9 +1,9 @@
-import { BaseController } from 'outlinejs/lib/controllers';
+import { controllers } from 'outlinejs';
 
 import { AlloView, AlloDetailView } from './views';
 
 
-export class AlloController extends BaseController {
+export class AlloController extends controllers.BaseController {
   static get loginRequired() {
     return false;
   }
@@ -18,7 +18,7 @@ export class AlloController extends BaseController {
 
 }
 
-export class AlloDetailController extends BaseController {
+export class AlloDetailController extends controllers.BaseController {
   static get loginRequired() {
     return false;
   }

@@ -1,12 +1,13 @@
-import { BaseRouter, url } from 'outlinejs/lib/routers';
+import { routers } from 'outlinejs';
+import { routing } from 'outlinejs';
 
 import { MyController } from './controllers';
 
 
-export default class extends BaseRouter {
-  get urlPatterns() {
+export default class extends routers.BaseRouter {
+  static get urlPatterns() {
     return {
-      '': url('<%= applicationSlug %>:main', MyController)
+      '': routing.i18nUrl('<%= applicationSlug %>:main', MyController)
     };
   }
 }
