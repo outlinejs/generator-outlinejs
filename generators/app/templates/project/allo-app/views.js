@@ -10,8 +10,8 @@ let Link = components.Link;
 class MenuView extends components.BaseComponent {
   render() {
     return <ul className="nav nav-pills pull-right">
-      <li className={routing.Utils.activeCssClass(this.request, 'allo:home')}><Link state="allo:home">Home</Link></li>
-      <li className={routing.Utils.activeCssClass(this.request, 'allo:other')}><Link state="allo:other" params={{detailId: 1}}>Other Page</Link></li>
+      <li className={routing.Utils.activeCssClass('allo:home', this.request)}><Link state="allo:home">Home</Link></li>
+      <li className={routing.Utils.activeCssClass('allo:other', this.request)}><Link state="allo:other" params={{detailId: 1}}>Other Page</Link></li>
     </ul>;
   }
 }
